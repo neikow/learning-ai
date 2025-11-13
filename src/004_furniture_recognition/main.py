@@ -3,11 +3,14 @@ import math
 import cv2
 
 from common.computer_vision import webcam_context, frames
+from common.utils import get_device
 from furniture_recognition import get_model
 
 
 def main():
+    device = get_device()
     model = get_model()
+    model.to(device)
 
     with webcam_context() as camera:
         for frame in frames(camera):
@@ -31,8 +34,15 @@ def main():
                     color = (0, 255, 0)
                     thickness = 2
 
-                    cv2.putText(frame, f"{names[cls]} | {round(confidence * 100)}%", org, font, fontScale, color,
-                                thickness)
+                    cv2.putText(
+                        frame,
+                        f"{names[cls]} | {round(confidence * 100)}%",
+                        org,
+                        font,
+                        fontScale,
+                        color,
+                        thickness
+                    )
 
 
 if __name__ == "__main__":

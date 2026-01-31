@@ -1,6 +1,8 @@
 import cv2
+from ultralytics.engine.results import Results
 
 from common.computer_vision import webcam_context, frames
+from common.cv_drawing import draw_box, draw_keypoints
 from common.utils import get_device
 from hand_gestures import get_model
 
@@ -21,29 +23,17 @@ def main():
 
     with webcam_context() as camera:
         for frame in frames(camera):
-            results = model(frame, stream=True)
+            detections: list[Results] = model(frame, stream=True)
 
-            names = model.names
+            for r in detections:
+                for hand_index, (box, keypoints) in enumerate(zip(r.boxes, r.keypoints)):
+                    draw_box(frame, box, label_map={0: f"Hand {hand_index + 1}"})
 
-            for hand_index, r in enumerate(results):
-                for box, keypoints in zip(r.boxes, r.keypoints.xy):
-                    x1, y1, x2, y2 = box.xyxy[0]
-                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-
-                    for index, (x, y) in enumerate(keypoints):
-                        x, y = int(x), int(y)
-                        cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
-                        cv2.putText(
-                            frame,
-                            str(index),
-                            (x + 5, y - 5),
-                            cv2.FONT_HERSHEY_SIMPLEX,
-                            0.5,
-                            (255, 0, 0),
-                            1
-                        )
+                    draw_keypoints(
+                        frame,
+                        keypoints,
+                        draw_indices=True,
+                    )
 
                     for connection in CONNECTIONS:
                         start_idx, end_idx = connection

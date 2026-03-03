@@ -21,3 +21,10 @@ def train_model(epochs: int = 100):
         name="furniture_recognition_model",
         device=get_device()
     )
+
+
+def export_to_mlpackage():
+    model = get_model()
+    exported_path = model.export(format="coreml", imgsz=640)
+    print(f"Model exported to MLPackage format at: {exported_path}")
+    return exported_path

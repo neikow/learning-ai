@@ -5,6 +5,7 @@ description = "Add your description here"
 requires-python = ">=3.13"
 dependencies = [
     "black>=25.11.0",
+    "coremltools>=9.0",
     "gym-super-mario-bros>=7.4.0",
     "gymnasium>=1.2.2",
     "matplotlib>=3.10.7",
